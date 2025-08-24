@@ -1,10 +1,9 @@
 import 'dart:async';
 
+import 'package:myapp/features/irrigacao/data/in_memory/irrigacao_in_memory_repo.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../irrigacao/data/models/leitura.dart';
-import '../../../irrigacao/domain/repositories.dart';
 import '../../../../core/errors/app_exception.dart';
-
 part 'leituras_controller.g.dart';
 
 @riverpod
@@ -42,7 +41,9 @@ class LeiturasController extends _$LeiturasController {
       );
       await irrigacaoRepository.criarLeitura(novaLeitura);
       // Reload leituras to update the list
-      state = await AsyncValue.guard(() => _loadLeituras(talhaoId: this.talhaoId));
+      state = await AsyncValue.guard(
+        () => _loadLeituras(talhaoId: this.talhaoId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -54,7 +55,9 @@ class LeiturasController extends _$LeiturasController {
       final irrigacaoRepository = ref.read(irrigacaoRepositoryProvider);
       await irrigacaoRepository.removerLeitura(id);
       // Reload leituras to update the list
-      state = await AsyncValue.guard(() => _loadLeituras(talhaoId: this.talhaoId));
+      state = await AsyncValue.guard(
+        () => _loadLeituras(talhaoId: this.talhaoId),
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -63,7 +66,9 @@ class LeiturasController extends _$LeiturasController {
   // In-memory simulation of synchronization
   Future<void> sincronizar() async {
     if (state.hasValue) {
-      state = AsyncValue.data(state.value!.map((l) => l.copyWith(pendenteSync: false)).toList());
+      state = AsyncValue.data(
+        state.value!.map((l) => l.copyWith(pendenteSync: false)).toList(),
+      );
     }
   }
 }

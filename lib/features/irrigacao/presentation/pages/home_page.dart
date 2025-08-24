@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:gap/gap.dart';
+import 'package:myapp/features/irrigacao/data/in_memory/irrigacao_in_memory_datasource.dart';
+import 'package:myapp/features/irrigacao/presentation/controllers/leituras_controller.dart';
+import 'package:myapp/features/irrigacao/presentation/controllers/recomendacao_controller.dart';
+import 'package:myapp/features/irrigacao/presentation/widgets/leitura_tile.dart';
+import 'package:myapp/features/irrigacao/presentation/widgets/recomendacao_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,7 +29,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (talhoes.isNotEmpty) {
       selectedTalhaoId = talhoes.first.id;
       // Load leituras for the initial talhao
-      ref.read(leiturasControllerProvider.notifier).load(talhaoId: selectedTalhaoId);
+      ref.read(leiturasControllerProvider(talhaoId: selectedTalhaoId).notifier).load(talhaoId: selectedTalhaoId);
     }
   }
 
@@ -59,7 +63,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 setState(() {
                   selectedTalhaoId = value;
                   if (selectedTalhaoId != null) {
-                    ref.read(leiturasControllerProvider.notifier).load(talhaoId: selectedTalhaoId);
+                    ref.read(leiturasControllerProvider(talhaoId: selectedTalhaoId).notifier).load();
                     // Optionally clear previous recommendation when changing talhao
                     ref.read(recomendacaoControllerProvider.notifier).state = const AsyncValue.data(null);
                   }

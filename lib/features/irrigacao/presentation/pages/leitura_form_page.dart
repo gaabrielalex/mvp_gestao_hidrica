@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/errors/app_exception.dart';
 import '../controllers/leituras_controller.dart';
 
@@ -55,9 +53,7 @@ class _LeituraFormPageState extends ConsumerState<LeituraFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Novo Registro de Umidade'),
-      ),
+      appBar: AppBar(title: const Text('Novo Registro de Umidade')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -68,7 +64,9 @@ class _LeituraFormPageState extends ConsumerState<LeituraFormPage> {
               TextFormField(
                 controller: _umidadeController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Umidade do Solo (%)'),
+                decoration: const InputDecoration(
+                  labelText: 'Umidade do Solo (%)',
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira a umidade.';

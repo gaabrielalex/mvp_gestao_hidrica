@@ -9,6 +9,10 @@ class IrrigacaoInMemoryDataSource {
   final Uuid _uuid = const Uuid();
   final Random _random = Random();
 
+  List<Leitura> get leituras => _leituras;
+  List<Talhao> get talhoes => _talhoes;
+  List<Talhao> get initialTalhoes => _talhoes;
+
   IrrigacaoInMemoryDataSource() {
     _seedData();
   }
