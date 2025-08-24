@@ -34,7 +34,7 @@ class _LeituraFormPageState extends ConsumerState<LeituraFormPage> {
             )
             .adicionarLeitura(widget.talhaoId, umidade);
         if (mounted) {
-          GoRouter.of(context).pop();
+          context.go('/');
         }
       } on AppException catch (e) {
         if (mounted) {
