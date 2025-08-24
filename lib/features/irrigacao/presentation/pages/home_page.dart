@@ -18,18 +18,15 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   String? selectedTalhaoId;
+  late final talhoes = IrrigacaoInMemoryDataSource().initialTalhoes;
 
   @override
   void initState() {
     super.initState();
-    // Load talhoes initially
-    // This assumes a provider for talhoes exists, perhaps in the repository or a dedicated talhao controller
-    // For this MVP, we'll use a placeholder and select the first talhao
-    final talhoes =
-        IrrigacaoInMemoryDataSource().initialTalhoes; // Placeholder access
+    // Define o primeiro talhão como selecionado se houver
     if (talhoes.isNotEmpty) {
       selectedTalhaoId = talhoes.first.id;
-      // Load leituras for the initial talhao
+      // Carrega leituras iniciais
       ref
           .read(leiturasControllerProvider(talhaoId: selectedTalhaoId).notifier)
           .load(talhaoId: selectedTalhaoId);
@@ -38,12 +35,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final leiturasState = ref.watch(
-      leiturasControllerProvider(talhaoId: selectedTalhaoId),
-    );
+    final leiturasState =
+        ref.watch(leiturasControllerProvider(talhaoId: selectedTalhaoId));
     final recomendacaoState = ref.watch(recomendacaoControllerProvider);
-    // Placeholder for talhoes list, replace with actual provider later
-    final talhoes = IrrigacaoInMemoryDataSource().initialTalhoes;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Gestão Hídrica')),
@@ -52,9 +46,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Talhao selection
+            // 🔽 Dropdown de talhões
             DropdownButtonFormField<String>(
-              value: selectedTalhaoId,
+              value: talhoes.any((t) => t.id == selectedTalhaoId)
+                  ? selectedTalhaoId
+                  : null, // só mostra se existir
               decoration: const InputDecoration(labelText: 'Talhão'),
               items: talhoes.map((talhao) {
                 return DropdownMenuItem(
@@ -73,7 +69,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ).notifier,
                         )
                         .load();
-                    // Optionally clear previous recommendation when changing talhao
+                    // limpa recomendação quando troca de talhão
                     ref.read(recomendacaoControllerProvider.notifier).state =
                         const AsyncValue.data(null);
                   }
@@ -82,7 +78,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const Gap(16),
 
-            // Recommendation Card
+            // 🔽 Card de recomendação
             recomendacaoState.when(
               data: (recomendacao) {
                 if (recomendacao != null) {
@@ -96,7 +92,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const Gap(8),
 
-            // Generate Recommendation Button
+            // 🔽 Botão para gerar recomendação
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
@@ -112,7 +108,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             const Gap(16),
 
-            // Humidity Chart (Simple placeholder)
+            // 🔽 Gráfico de umidade
             const Text('Umidade do Solo (últimos 7 dias)'),
             const Gap(8),
             SizedBox(
@@ -124,20 +120,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                       child: Text('Sem dados de umidade para exibir.'),
                     );
                   }
-                  // Filter last 7 days data (simple approach)
-                  final recentLeituras =
-                      leituras
-                          .where(
-                            (l) => l.data.isAfter(
-                              DateTime.now().subtract(const Duration(days: 7)),
-                            ),
-                          )
-                          .toList()
-                        ..sort((a, b) => a.data.compareTo(b.data));
+                  final recentLeituras = leituras
+                      .where((l) => l.data.isAfter(
+                            DateTime.now().subtract(const Duration(days: 7)),
+                          ))
+                      .toList()
+                    ..sort((a, b) => a.data.compareTo(b.data));
 
                   if (recentLeituras.isEmpty) {
                     return const Center(
-                      child: Text('Sem dados de umidade nos últimos 7 dias.'),
+                      child:
+                          Text('Sem dados de umidade nos últimos 7 dias.'),
                     );
                   }
 
@@ -175,15 +168,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             const Text('Leituras Registradas'),
             const Gap(8),
 
-            // Leituras List
+            // 🔽 Lista de leituras
             Expanded(
               child: leiturasState.when(
                 data: (leituras) {
                   if (leituras.isEmpty) {
                     return const Center(
-                      child: Text(
-                        'Nenhuma leitura registrada para este talhão.',
-                      ),
+                      child: Text('Nenhuma leitura registrada para este talhão.'),
                     );
                   }
                   return ListView.builder(
