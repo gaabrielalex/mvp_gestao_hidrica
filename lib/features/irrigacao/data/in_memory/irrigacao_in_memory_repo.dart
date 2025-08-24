@@ -19,7 +19,7 @@ class IrrigacaoInMemoryRepo implements IrrigacaoRepository {
 
   @override
   Future<List<Talhao>> listarTalhoes() async {
-    return _dataSource.talhoes;
+    return _dataSource.listarTalhoes();
   }
 
   @override
@@ -27,10 +27,10 @@ class IrrigacaoInMemoryRepo implements IrrigacaoRepository {
     if (talhaoId == null) {
       return _dataSource.leituras;
     }
-    return _dataSource.leituras
-        .where((leitura) => leitura.talhaoId == talhaoId)
+ return (await _dataSource.listarLeituras())
+ .where((leitura) => leitura.talhaoId == talhaoId)
         .toList();
-  }
+ }
 
   @override
   Future<Leitura> criarLeitura(Leitura leitura) async {
