@@ -14,6 +14,13 @@ It focuses on registering soil moisture readings for land plots ("talhões") and
 
 ---
 
+## 🚀 Demo Online
+
+You can access the running app here:  
+👉 [https://mvp-gestao-hidrica.vercel.app/](https://mvp-gestao-hidrica.vercel.app/)
+
+---
+
 ## 🚧 Project Status
 
 This project is an early **MVP built for hackathon purposes**.  
