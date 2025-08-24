@@ -25,25 +25,28 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Load talhoes initially
     // This assumes a provider for talhoes exists, perhaps in the repository or a dedicated talhao controller
     // For this MVP, we'll use a placeholder and select the first talhao
-    final talhoes = IrrigacaoInMemoryDataSource().initialTalhoes; // Placeholder access
+    final talhoes =
+        IrrigacaoInMemoryDataSource().initialTalhoes; // Placeholder access
     if (talhoes.isNotEmpty) {
       selectedTalhaoId = talhoes.first.id;
       // Load leituras for the initial talhao
-      ref.read(leiturasControllerProvider(talhaoId: selectedTalhaoId).notifier).load(talhaoId: selectedTalhaoId);
+      ref
+          .read(leiturasControllerProvider(talhaoId: selectedTalhaoId).notifier)
+          .load(talhaoId: selectedTalhaoId);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final leiturasState = ref.watch(leiturasControllerProvider);
+    final leiturasState = ref.watch(
+      leiturasControllerProvider(talhaoId: selectedTalhaoId),
+    );
     final recomendacaoState = ref.watch(recomendacaoControllerProvider);
     // Placeholder for talhoes list, replace with actual provider later
     final talhoes = IrrigacaoInMemoryDataSource().initialTalhoes;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gestão Hídrica'),
-      ),
+      appBar: AppBar(title: const Text('Gestão Hídrica')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -63,9 +66,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                 setState(() {
                   selectedTalhaoId = value;
                   if (selectedTalhaoId != null) {
-                    ref.read(leiturasControllerProvider(talhaoId: selectedTalhaoId).notifier).load();
+                    ref
+                        .read(
+                          leiturasControllerProvider(
+                            talhaoId: selectedTalhaoId,
+                          ).notifier,
+                        )
+                        .load();
                     // Optionally clear previous recommendation when changing talhao
-                    ref.read(recomendacaoControllerProvider.notifier).state = const AsyncValue.data(null);
+                    ref.read(recomendacaoControllerProvider.notifier).state =
+                        const AsyncValue.data(null);
                   }
                 });
               },
@@ -81,7 +91,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 return const SizedBox.shrink();
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Text('Erro ao carregar recomendação: $error'),
+              error: (error, stack) =>
+                  Text('Erro ao carregar recomendação: $error'),
             ),
             const Gap(8),
 
@@ -91,7 +102,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: ElevatedButton(
                 onPressed: selectedTalhaoId != null
                     ? () {
-                        ref.read(recomendacaoControllerProvider.notifier).gerar(selectedTalhaoId!);
+                        ref
+                            .read(recomendacaoControllerProvider.notifier)
+                            .gerar(selectedTalhaoId!);
                       }
                     : null,
                 child: const Text('Gerar Recomendação'),
@@ -107,16 +120,25 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: leiturasState.when(
                 data: (leituras) {
                   if (leituras.isEmpty) {
-                    return const Center(child: Text('Sem dados de umidade para exibir.'));
+                    return const Center(
+                      child: Text('Sem dados de umidade para exibir.'),
+                    );
                   }
                   // Filter last 7 days data (simple approach)
-                  final recentLeituras = leituras
-                      .where((l) => l.data.isAfter(DateTime.now().subtract(const Duration(days: 7))))
-                      .toList()
+                  final recentLeituras =
+                      leituras
+                          .where(
+                            (l) => l.data.isAfter(
+                              DateTime.now().subtract(const Duration(days: 7)),
+                            ),
+                          )
+                          .toList()
                         ..sort((a, b) => a.data.compareTo(b.data));
 
                   if (recentLeituras.isEmpty) {
-                     return const Center(child: Text('Sem dados de umidade nos últimos 7 dias.'));
+                    return const Center(
+                      child: Text('Sem dados de umidade nos últimos 7 dias.'),
+                    );
                   }
 
                   return LineChart(
@@ -127,7 +149,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                       lineBarsData: [
                         LineChartBarData(
                           spots: recentLeituras.asMap().entries.map((entry) {
-                            return FlSpot(entry.key.toDouble(), entry.value.umidadeSolo);
+                            return FlSpot(
+                              entry.key.toDouble(),
+                              entry.value.umidadeSolo,
+                            );
                           }).toList(),
                           isCurved: true,
                           color: Theme.of(context).primaryColor,
@@ -141,7 +166,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => Text('Erro ao carregar gráfico: $error'),
+                error: (error, stack) =>
+                    Text('Erro ao carregar gráfico: $error'),
               ),
             ),
             const Gap(16),
@@ -154,7 +180,11 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: leiturasState.when(
                 data: (leituras) {
                   if (leituras.isEmpty) {
-                    return const Center(child: Text('Nenhuma leitura registrada para este talhão.'));
+                    return const Center(
+                      child: Text(
+                        'Nenhuma leitura registrada para este talhão.',
+                      ),
+                    );
                   }
                   return ListView.builder(
                     itemCount: leituras.length,
@@ -165,18 +195,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => Text('Erro ao carregar leituras: $error'),
+                error: (error, stack) =>
+                    Text('Erro ao carregar leituras: $error'),
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: selectedTalhaoId != null ? FloatingActionButton(
-        onPressed: () {
-          context.go('/talhao/$selectedTalhaoId/novo-registro');
-        },
-        child: const Icon(Icons.add),
-      ) : null,
+      floatingActionButton: selectedTalhaoId != null
+          ? FloatingActionButton(
+              onPressed: () {
+                context.go('/talhao/$selectedTalhaoId/novo-registro');
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

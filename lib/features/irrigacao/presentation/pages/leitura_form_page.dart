@@ -29,7 +29,9 @@ class _LeituraFormPageState extends ConsumerState<LeituraFormPage> {
       final umidade = double.parse(_umidadeController.text);
       try {
         await ref
-            .read(leiturasControllerProvider.notifier)
+            .read(
+              leiturasControllerProvider(talhaoId: widget.talhaoId).notifier,
+            )
             .adicionarLeitura(widget.talhaoId, umidade);
         if (mounted) {
           GoRouter.of(context).pop();
